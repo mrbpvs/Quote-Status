@@ -1,4 +1,4 @@
-.vscode/*.*
+
 *.app
 .alpackages/Microsoft_Application_20.1.39764.39901.app
 .vscode/launch.json
