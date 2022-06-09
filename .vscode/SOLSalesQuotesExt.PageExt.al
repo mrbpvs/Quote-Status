@@ -5,7 +5,7 @@ pageextension 50125 SalesQuotesExt extends "Sales Quotes"
         // Add changes to page layout here
         addafter("Due Date")
         {
-            field(WonLostStatus; Rec.WonLostStatus)
+            field(WonLostStatus; Rec."Won/Lost Quote Status")
             {
 
                 Editable = false;

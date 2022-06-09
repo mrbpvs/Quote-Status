@@ -3,7 +3,7 @@ tableextension 50121 SalesHeaderExt extends "Sales Header"
     fields
     {
         // Add changes to table fields here
-        field(500; WonLostStatus; Enum "Won/Lost Status ")
+        field(500; "Won/Lost Quote Status"; Enum "Won/Lost Status ")
         {
             DataClassification = CustomerContent;
             Caption = 'Won/Lost Status';
@@ -24,22 +24,22 @@ tableextension 50121 SalesHeaderExt extends "Sales Header"
         {
             DataClassification = CustomerContent;
             Caption = 'Won/Lost Reason Code';
-            TableRelation = if (WonLostStatus = const(Won)) "Close Opportunity Code" where(Type = const(Won))
+            TableRelation = if ("Won/Lost Quote Status" = const(Won)) "Close Opportunity Code" where(Type = const(Won))
             else
-            if (WonLostStatus = const(Lost)) "Close Opportunity Code" where(Type = const(Lost));
+            if ("Won/Lost Quote Status"= const(Lost)) "Close Opportunity Code" where(Type = const(Lost));
 
             trigger OnValidate()
             begin
                 CalcFields(WonLostReasonDesc);
             end;
-            
+
         }
         field(503; WonLostReasonDesc; Text[100])
         {
             Caption = 'Won/lost Reason Description';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = lookup ("Close Opportunity Code".Description where(Code= field(WonLostReasonCode)));
+            CalcFormula = lookup("Close Opportunity Code".Description where(Code = field(WonLostReasonCode)));
 
         }
         field(504; WonLostRemarks; Text[2048])
