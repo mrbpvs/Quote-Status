@@ -1,4 +1,4 @@
-page 50128 CloseQuote
+page 50128 "Close Quote"
 {
     PageType = Card;
     Caption = 'Close Quote';

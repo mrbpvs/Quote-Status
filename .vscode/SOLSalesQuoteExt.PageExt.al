@@ -53,7 +53,7 @@ pageextension 50124 SalesQuoteExt extends "Sales Quote"
                 var
                     QuoteStatusMgt: Codeunit "Quote Status Mgt";
                 begin
-                    if Page.RunModal(Page::CloseQuote, Rec) = Action::LookupOK then
+                    if Page.RunModal(Page::"Close Quote", Rec) = Action::LookupOK then
                         QuoteStatusMgt.CloseQuote(Rec);
                 end;
             }
