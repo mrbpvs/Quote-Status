@@ -85,4 +85,57 @@ codeunit 50129 "Quote Status Mgt"
         if SalesPerson.FindFirst() then
             exit(SalesPerson.Code);
     end;
+
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Conf./Personalization Mgt.", 'OnRoleCenterOpen', '', true, true)]
+    local procedure ShowNotificationInRoleCenter()
+    var
+        SalespersonCode: Code[20];
+        SalesHeader: Record "Sales Header";
+
+    begin
+        SalespersonCode := GetSalesPersonForLoggedInUser();
+
+        if SalespersonCode = '' then
+            exit;
+
+        // Get won quotes
+        GetQuoteRecords(SalesHeader."Won/Lost Quote Status"::Won, SalespersonCode);
+        //Get lost quotes
+        GetQuoteRecords(SalesHeader."Won/Lost Quote Status"::Lost, SalespersonCode);
+    end;
+
+    local procedure GetQuoteRecords(WonLostStatus: Enum "Won/Lost Status "; SalespersonCode: Code[20])
+    var
+        SalesHeader: Record "Sales Header";
+        NoOfrecords: Integer;
+    begin
+        SalesHeader.Reset();
+        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Quote);
+        SalesHeader.SetRange("Salesperson Code", SalespersonCode);
+        SalesHeader.SetRange("Won/Lost Quote Status", WonLostStatus);
+        SalesHeader.SetRange(WonLostDate, AddDaystoDateTime(CurrentDateTime(), -5), CurrentDateTime());
+        NoOfrecords := SalesHeader.Count();
+
+        if NoOfrecords <> 0 then
+            SendNoOfQuoteNotification(NoOfrecords, WonLostStatus, SalespersonCode);
+    end;
+
+    local procedure AddDaysToDateTime(SourceDateTime: DateTime; NoOfDays: Integer): DateTime
+    begin
+        exit(SourceDateTime + (NoOfDays * 86400000));
+    end;
+
+    local procedure SendNoOfQuoteNotification(NoOfQuotes: Integer; WonLostStatus: Enum "Won/Lost Status "; SalespersonCode: Code[20])
+    var
+        QuoteNotification: Notification;
+        YouWonLostQuoteMsg: Label 'you %1 ''%2'' quote(s) during the last 5 days.', Comment = '%1 = Won/Lost; %2= No of quotes';
+        ShowQuotesLbl: Label 'Show %1 Quotes', Comment = '%1 = Won/Lost';
+
+    begin
+        QuoteNotification.Message := StrSubstNo(YouWonLostQuoteMsg, WonLostStatus, NoOfQuotes);
+        QuoteNotification.SetData('SalespersonCode', SalespersonCode);
+        QuoteNotification.SetData('WonLostStatus', Format(WonLostStatus.AsInteger()));
+        QuoteNotification.AddAction(StrSubstNo(ShowQuotesLbl, WonLostStatus), Codeunit::"Quote Status Mgt", 'OpenQuotes');
+    end;
 }
