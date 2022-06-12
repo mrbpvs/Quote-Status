@@ -49,7 +49,7 @@ codeunit 50129 "Quote Status Mgt"
     begin
         if SalesHeader."Won/Lost Quote Status" <> SalesHeader."Won/Lost Quote Status"::InProgress then
             exit;
-        if Page.RunModal(Page::"Close Quote", SalesHeader) <> Action::LookupOK then
+        if Page.RunModal(Page::"Sales Quote Status List", SalesHeader) <> Action::LookupOK then
             Error(NotCompltederr);
     end;
 
@@ -67,5 +67,22 @@ codeunit 50129 "Quote Status Mgt"
 
     end;
 
+    procedure GetSalesPersonForLoggedInUser(): Code[20]
 
+    var
+        User: Record User;
+        SalesPerson: Record "Salesperson/Purchaser";
+    begin
+        User.Reset();
+        if not User.Get(UserSecurityId()) then
+            exit('');
+
+        if User."Contact Email".Trim() = '' then
+            exit('');
+
+        SalesPerson.Reset();
+        SalesPerson.SetRange("E-Mail", User."Contact Email");
+        if SalesPerson.FindFirst() then
+            exit(SalesPerson.Code);
+    end;
 }

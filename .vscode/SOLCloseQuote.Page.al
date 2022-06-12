@@ -1,6 +1,6 @@
-page 50128 "Close Quote"
+page 50128 "Sales Quote Status List"
 {
-    PageType = Card;
+    PageType = ListPart;
     Caption = 'Close Quote';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -48,27 +48,28 @@ page 50128 "Close Quote"
         }
     }
     var
-    AllowChangeStatus: Boolean;
+        AllowChangeStatus: Boolean;
+
     trigger OnOpenPage()
     begin
-    AllowChangeStatus := Rec. "Won/Lost Quote Status" <> Rec."Won/Lost Quote Status"::Won;
+        AllowChangeStatus := Rec."Won/Lost Quote Status" <> Rec."Won/Lost Quote Status"::Won;
     end;
 
-trigger OnQueryClosePage(CloseAction: Action): Boolean
-begin
-    if CloseAction = Action::LookupOK then
-    FinishWizard();
-end;
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    begin
+        if CloseAction = Action::LookupOK then
+            FinishWizard();
+    end;
 
-local procedure FinishWizard()
-var
-MustSelectWonOrLostErr: Label 'You must select either Won or Lost';
-FieldMustBeFilledInErr: Label 'You must fill in the %1 field', Comment = '%1 = Caption of the field';
-begin
-    if not (Rec."Won/Lost Quote Status" in [Rec."Won/Lost Quote Status"::Won, Rec."Won/Lost Quote Status"::Lost]) then
-    Error(MustSelectWonOrLostErr);
+    local procedure FinishWizard()
+    var
+        MustSelectWonOrLostErr: Label 'You must select either Won or Lost';
+        FieldMustBeFilledInErr: Label 'You must fill in the %1 field', Comment = '%1 = Caption of the field';
+    begin
+        if not (Rec."Won/Lost Quote Status" in [Rec."Won/Lost Quote Status"::Won, Rec."Won/Lost Quote Status"::Lost]) then
+            Error(MustSelectWonOrLostErr);
 
-    if Rec.WonLostReasonCode = '' then
-Error(FieldMustBeFilledInErr, Rec.FieldCaption(WonLostReasonCode));
-end;
+        if Rec.WonLostReasonCode = '' then
+            Error(FieldMustBeFilledInErr, Rec.FieldCaption(WonLostReasonCode));
+    end;
 }
